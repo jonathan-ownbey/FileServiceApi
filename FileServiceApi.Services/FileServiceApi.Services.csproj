@@ -5,8 +5,15 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Autofac" Version="4.8.1" />
+    <PackageReference Include="Microsoft.AspNetCore.Http.Features" Version="2.1.1" />
     <PackageReference Include="Serilog" Version="2.7.1" />
+    <PackageReference Include="System.Threading.Tasks" Version="4.3.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\FileServiceApi.Data\FileServiceApi.Data.csproj" />
+    <ProjectReference Include="..\FileServiceApi.FileStorers\FileServiceApi.FileStorers.csproj" />
+    <ProjectReference Include="..\FileServiceApi.Models\FileServiceApi.Models.csproj" />
   </ItemGroup>
 
 </Project>
