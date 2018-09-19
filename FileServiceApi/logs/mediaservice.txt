@@ -1,0 +1,61 @@
+2018-09-19 09:54:14.642 -04:00 [INF] Creating MongoDB service.
+2018-09-19 09:54:14.769 -04:00 [ERR] Failed to create MongoDB service.
+MongoDB.Driver.MongoConfigurationException: The connection string '' is not valid.
+   at MongoDB.Driver.Core.Configuration.ConnectionString.Parse()
+   at MongoDB.Driver.MongoUrlBuilder.Parse(String url)
+   at MongoDB.Driver.MongoUrl..ctor(String url)
+   at MongoDB.Driver.MongoClient..ctor(String connectionString)
+   at FileServiceApi.Data.MongoDbService..ctor(IOptions`1 configurationSettings) in C:\Users\Jon Ownbey\source\repos\FileServiceApi\FileServiceApi.Data\MongoDbService.cs:line 20
+2018-09-19 09:56:03.567 -04:00 [INF] Creating MongoDB service.
+2018-09-19 09:56:03.671 -04:00 [ERR] Failed to create MongoDB service.
+MongoDB.Driver.MongoConfigurationException: The connection string '' is not valid.
+   at MongoDB.Driver.Core.Configuration.ConnectionString.Parse()
+   at MongoDB.Driver.MongoUrlBuilder.Parse(String url)
+   at MongoDB.Driver.MongoUrl..ctor(String url)
+   at MongoDB.Driver.MongoClient..ctor(String connectionString)
+   at FileServiceApi.Data.MongoDbService..ctor(IOptions`1 configurationSettings) in C:\Users\Jon Ownbey\source\repos\FileServiceApi\FileServiceApi.Data\MongoDbService.cs:line 20
+2018-09-19 09:56:48.320 -04:00 [INF] Creating MongoDB service.
+2018-09-19 09:56:48.851 -04:00 [INF] Successfully created MongoDB service.
+2018-09-19 09:56:48.871 -04:00 [INF] Retrieving List of FileMetaData for all files.
+2018-09-19 10:23:07.744 -04:00 [INF] Incorrect or no service type defined in appsettings.json.
+2018-09-19 10:23:07.799 -04:00 [INF] Creating MongoDB service.
+2018-09-19 10:23:08.283 -04:00 [INF] Successfully created MongoDB service.
+2018-09-19 10:23:08.299 -04:00 [INF] Retrieving List of FileMetaData for all files.
+2018-09-19 10:23:31.219 -04:00 [INF] Incorrect or no service type defined in appsettings.json.
+2018-09-19 10:23:31.270 -04:00 [INF] Creating MongoDB service.
+2018-09-19 10:23:31.717 -04:00 [INF] Successfully created MongoDB service.
+2018-09-19 10:23:31.733 -04:00 [INF] Retrieving List of FileMetaData for all files.
+2018-09-19 10:23:53.963 -04:00 [INF] Incorrect or no service type defined in appsettings.json.
+2018-09-19 10:23:53.963 -04:00 [INF] Creating MongoDB service.
+2018-09-19 10:23:53.966 -04:00 [INF] Successfully created MongoDB service.
+2018-09-19 10:23:54.157 -04:00 [ERR] File failed to upload, max file size is 0MB
+2018-09-19 10:24:19.938 -04:00 [INF] Incorrect or no service type defined in appsettings.json.
+2018-09-19 10:24:19.938 -04:00 [INF] Creating MongoDB service.
+2018-09-19 10:24:19.939 -04:00 [INF] Successfully created MongoDB service.
+2018-09-19 10:37:37.451 -04:00 [INF] Incorrect or no service type defined in appsettings.json.
+2018-09-19 10:37:37.532 -04:00 [INF] Creating MongoDB service.
+2018-09-19 10:37:38.189 -04:00 [INF] Successfully created MongoDB service.
+2018-09-19 10:37:38.214 -04:00 [INF] Retrieving List of FileMetaData for all files.
+2018-09-19 10:37:45.148 -04:00 [INF] Incorrect or no service type defined in appsettings.json.
+2018-09-19 10:37:45.148 -04:00 [INF] Creating MongoDB service.
+2018-09-19 10:37:45.150 -04:00 [INF] Successfully created MongoDB service.
+2018-09-19 10:37:47.701 -04:00 [ERR] File failed to upload, max file size is 102400MB
+2018-09-19 10:38:06.198 -04:00 [INF] Incorrect or no service type defined in appsettings.json.
+2018-09-19 10:38:06.198 -04:00 [INF] Creating MongoDB service.
+2018-09-19 10:38:06.199 -04:00 [INF] Successfully created MongoDB service.
+2018-09-19 10:39:04.564 -04:00 [INF] Incorrect or no service type defined in appsettings.json.
+2018-09-19 10:39:04.613 -04:00 [INF] Creating MongoDB service.
+2018-09-19 10:39:05.746 -04:00 [INF] Successfully created MongoDB service.
+2018-09-19 10:39:05.795 -04:00 [INF] Retrieving List of FileMetaData for all files.
+2018-09-19 10:39:05.838 -04:00 [INF] Incorrect or no service type defined in appsettings.json.
+2018-09-19 10:39:05.838 -04:00 [INF] Creating MongoDB service.
+2018-09-19 10:39:05.847 -04:00 [INF] Successfully created MongoDB service.
+2018-09-19 10:39:12.432 -04:00 [INF] Uploading file: Nichi Pi.jpg.
+2018-09-19 10:39:12.436 -04:00 [INF] Uploading file: 507b53ac-a2c8-45ab-91d8-806fa50acc32 to bucket: demofileservice.
+2018-09-19 10:39:12.440 -04:00 [INF] Creating bucket: demofileservice.
+2018-09-19 10:39:12.497 -04:00 [ERR] Failed to create bucket: demofileservice.
+System.NullReferenceException: Object reference not set to an instance of an object.
+   at FileServiceApi.FileStorers.MinioFileStorer.CreateBucket(String bucketName, String location) in C:\Users\Jon Ownbey\source\repos\FileServiceApi\FileServiceApi.FileStorers\MinioFileStorer.cs:line 144
+2018-09-19 10:39:12.566 -04:00 [INF] Upload succeeded.
+2018-09-19 10:39:12.567 -04:00 [INF] Inserting list of FileMetaData: System.Collections.Generic.List`1[FileServiceApi.Models.FileMetaData] in MongoDB.
+2018-09-19 10:39:12.714 -04:00 [INF] List of FileMetaData inserted successfully.

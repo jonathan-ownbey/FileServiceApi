@@ -1,0 +1,36 @@
+[
+  // https://www.freeformatter.com/mime-types-list.html
+  // A super comprehensive list of mime-types
+  {
+    "ContentType": "image/jpeg",
+    "Extension": "jpeg"
+  },
+  {
+    "ContentType": "image/jpeg",
+    "Extension": "jpg"
+  },
+  {
+    "ContentType": "application/pdf",
+    "Extension": "pdf"
+  },
+  {
+    "ContentType": "image/png",
+    "Extension": "png"
+  },
+  {
+    "ContentType": "text/plain",
+    "Extension": "txt"
+  },
+  {
+    "ContentType": "image/bmp",
+    "Extension": "bmp"
+  },
+  {
+    "ContentType": "text/csv",
+    "Extension": "csv"
+  },
+  {
+    "ContentType": "image/gif",
+    "Extension": "gif"
+  }
+]

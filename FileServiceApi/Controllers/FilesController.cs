@@ -27,7 +27,7 @@ namespace FileServiceApi.Controllers
             _fileService = fileService;
             _configurationSettings = configurationSettings;
 
-            _maxFileSize = _configurationSettings.Value.MaxUploadFileSize * 1024;
+            _maxFileSize = _configurationSettings.Value.MaxUploadFileSize * 1048576;
         }
 
         // GET api/files

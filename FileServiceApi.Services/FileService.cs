@@ -15,12 +15,14 @@ namespace FileServiceApi.Services
     public class FileService : IFileService
     {
         private readonly IOptions<ConfigurationSettings> _configurationSettings;
+        private readonly ILocalFileStorer _localFileStorer;
         private readonly IMinioFileStorer _minioFileStorer;
         private readonly IMongoDbService _mongoDbService;
 
-        public FileService(IMinioFileStorer minioFileStorer, IMongoDbService mongoDbService,
+        public FileService(ILocalFileStorer localFileStorer, IMinioFileStorer minioFileStorer, IMongoDbService mongoDbService,
             IOptions<ConfigurationSettings> configurationSettings)
         {
+            _localFileStorer = localFileStorer;
             _minioFileStorer = minioFileStorer;
             _mongoDbService = mongoDbService;
             _configurationSettings = configurationSettings;
@@ -56,7 +58,15 @@ namespace FileServiceApi.Services
 
                     fileMetaDatas.Add(fileMetaData);
 
-                    success = await _minioFileStorer.UploadFile(fileMetaData.FileGuid, formFile.OpenReadStream(), fileMetaData.FileType);
+                    if (_configurationSettings.Value.ServiceType == "default")
+                    {
+                        //Use the LocalFileStorer to write to local disk
+                        success = _localFileStorer.WriteFile(formFile, fileMetaData.FileGuid, _configurationSettings.Value.LocalStoragePath);
+                    }
+                    else
+                    {
+                        success = await _minioFileStorer.UploadFile(fileMetaData.FileGuid, formFile.OpenReadStream(), fileMetaData.FileType);
+                    }
                 }
 
                 if (!success) return null;
@@ -89,6 +99,11 @@ namespace FileServiceApi.Services
         /// <returns>A Task of type Stream containing the file data.</returns>
         public async Task<Stream> GetFile(string fileGuid)
         {
+            if (_configurationSettings.Value.ServiceType == "default")
+            {
+                return _localFileStorer.ReturnFile(fileGuid, _configurationSettings.Value.LocalStoragePath);
+            }
+
             return await _minioFileStorer.RetrieveFile(fileGuid);
         }
         /// <inheritdoc />
@@ -99,11 +114,20 @@ namespace FileServiceApi.Services
         public async Task<bool> DeleteFile(string fileGuid)
         {
             var success = false;
-            if (await _minioFileStorer.DeleteFile(fileGuid))
+
+            if (_configurationSettings.Value.ServiceType == "default")
             {
-                var fileGuids = new List<string> { fileGuid };
-                if (await _mongoDbService.DeleteFileMetaDatas(fileGuids))
-                    success = true;
+                if (_localFileStorer.DeleteFile(fileGuid, _configurationSettings.Value.LocalStoragePath))
+                    return true;
+            }
+            else
+            {
+                if (await _minioFileStorer.DeleteFile(fileGuid))
+                {
+                    var fileGuids = new List<string> { fileGuid };
+                    if (await _mongoDbService.DeleteFileMetaDatas(fileGuids))
+                        success = true;
+                }
             }
 
             return success;
