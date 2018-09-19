@@ -8,6 +8,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Threading.Tasks;
+using Newtonsoft.Json;
 
 namespace FileServiceApi.Services
 {
@@ -126,6 +127,44 @@ namespace FileServiceApi.Services
         {
             return await _mongoDbService.GetAllFileMetaDatas();
         }
+
+        /// <inheritdoc />
+        /// <summary>
+        /// Gets a list of allowed/whitelisted file content-types and extensions
+        /// </summary>
+        /// <returns>A list of FileContentType which contains the content-types and extensions</returns>
+        public List<FileContentType> GetAllowedFileTypes()
+        {
+            var currentDirectory = Directory.GetCurrentDirectory();
+            List<FileContentType> contentTypes;
+
+            try
+            {
+                using (var streamReader = new StreamReader($"{currentDirectory}/{_configurationSettings.Value.WhitelistFile}"))
+                {
+                    var json = streamReader.ReadToEnd();
+                    contentTypes = JsonConvert.DeserializeObject<List<FileContentType>>(json);
+                }
+            }
+            catch (Exception exception)
+            {
+                Log.Error(exception, "Failed to get list of content-types for whitelist.");
+                return null;
+            }
+
+            return contentTypes;
+        }
+
+        /// <inheritdoc />
+        /// <summary>
+        /// Gets the number of files previously uploaded.
+        /// </summary>
+        /// <returns>An int which represents the count of files uploaded.</returns>
+        public async Task<int> GetNumberOfFilesInStorage()
+        {
+            return await _mongoDbService.GetTotalNumberOfFiles();
+        }
+
         /// <summary>
         /// Creates and returns a string representation of a new Guid..
         /// </summary>

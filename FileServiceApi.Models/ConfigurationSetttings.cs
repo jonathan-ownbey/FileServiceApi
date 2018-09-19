@@ -79,5 +79,21 @@
         /// The secret key used to login to Azure server.
         /// </summary>
         public string AzureSecretKey { get; set; }
+        /// <summary>
+        /// The maximum number of files allowed to be uploaded.
+        /// </summary>
+        public string MaxFileUploadLimit { get; set; }
+        /// <summary>
+        /// The maximum file size allowed to be uploaded.
+        /// </summary>
+        public int MaxUploadFileSize { get; set; }
+        /// <summary>
+        /// A local storage path for the DefaultFileStorer.
+        /// </summary>
+        public string LocalStoragePath { get; set; }
+        /// <summary>
+        /// Name of the file used for whitelisting files.
+        /// </summary>
+        public string WhitelistFile { get; set; }
     }
 }
