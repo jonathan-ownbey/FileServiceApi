@@ -35,6 +35,7 @@ namespace FileServiceApi.Tests
         public async Task StoreFiles_Successfully_Returns_List()
         {
             var fileList = new List<IFormFile> {_mockFormFile.Object};
+            _mockLocalFileStorer.Setup(x => x.WriteFile(It.IsAny<IFormFile>(), It.IsAny<string>(), It.IsAny<string>())).Returns(true);
             _mockMinioStorer.Setup(x => x.UploadFile(It.IsAny<string>(), It.IsAny<Stream>(), It.IsAny<string>())).Returns(Task.FromResult(true));
             _mockMongoDbService.Setup(x => x.InsertFileDatas(It.IsAny<List<FileMetaData>>()));
 
