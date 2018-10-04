@@ -1,4 +1,5 @@
-﻿using FileServiceApi.FileStorers;
+﻿using System;
+using FileServiceApi.FileStorers;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
 using System.IO;
@@ -15,42 +16,19 @@ namespace FileServiceApi.Tests
         [TestMethod]
         public async Task UploadFile_Succeeds_And_Returns_True()
         {
-            const string contentType = "application/pdf";
-
-            var mockService = new Mock<IMinioFileStorer>();
-            mockService.Setup(x => x.UploadFile(It.IsAny<string>(), It.IsAny<Stream>(), It.IsAny<string>())).Returns(Task.FromResult(true));
-
-            var minioService = mockService.Object;
-
-            var result = await minioService.UploadFile(FileName, _fileStream.Object, contentType);
-
-            Assert.IsTrue(result);
+            throw new NotImplementedException();
         }
 
         [TestMethod]
         public async Task RetrieveFile_Successfully_Returns_Stream()
         {
-            var mockService = new Mock<IMinioFileStorer>();
-            mockService.Setup(x => x.RetrieveFile(It.IsAny<string>())).Returns(Task.FromResult(_fileStream.Object));
-
-            var minioService = mockService.Object;
-
-            var result = await minioService.RetrieveFile(FileName);
-
-            Assert.IsInstanceOfType(result, typeof(Stream));
+            throw new NotImplementedException();
         }
 
         [TestMethod]
         public async Task DeleteFile_Returns_True_On_Success()
         {
-            var mockService = new Mock<IMinioFileStorer>();
-            mockService.Setup(x => x.DeleteFile(It.IsAny<string>())).Returns(Task.FromResult(true));
-
-            var minioService = mockService.Object;
-
-            var result = await minioService.DeleteFile(FileName);
-
-            Assert.IsTrue(result);
+            throw new NotImplementedException();
         }
     }
 }
