@@ -8,6 +8,7 @@ using Microsoft.Net.Http.Headers;
 using Serilog;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -104,7 +105,7 @@ namespace FileServiceApi.Controllers
                         return StatusCode(413, errorString);
                     }
 
-                    if (!allowedFileTypes.Any(x => x.ContentType == file.ContentType && file.FileName.EndsWith(x.Extension)))
+                    if (!allowedFileTypes.Any(x => x.Extension.Equals(Path.GetExtension(file.FileName))))
                     {
                         var errorString = $"File with content-type: {file.ContentType} is not allowed.";
                         Log.Error(errorString);

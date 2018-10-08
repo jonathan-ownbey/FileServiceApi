@@ -3,34 +3,34 @@
   // A super comprehensive list of mime-types
   {
     "ContentType": "image/jpeg",
-    "Extension": "jpeg"
+    "Extension": ".jpeg"
   },
   {
     "ContentType": "image/jpeg",
-    "Extension": "jpg"
+    "Extension": ".jpg"
   },
   {
     "ContentType": "application/pdf",
-    "Extension": "pdf"
+    "Extension": ".pdf"
   },
   {
     "ContentType": "image/png",
-    "Extension": "png"
+    "Extension": ".png"
   },
   {
     "ContentType": "text/plain",
-    "Extension": "txt"
+    "Extension": ".txt"
   },
   {
     "ContentType": "image/bmp",
-    "Extension": "bmp"
+    "Extension": ".bmp"
   },
   {
     "ContentType": "text/csv",
-    "Extension": "csv"
+    "Extension": ".csv"
   },
   {
     "ContentType": "image/gif",
-    "Extension": "gif"
+    "Extension": ".gif"
   }
 ]
