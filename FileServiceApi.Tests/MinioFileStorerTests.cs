@@ -1,7 +1,6 @@
-﻿using System;
-using FileServiceApi.FileStorers;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
+using System;
 using System.IO;
 using System.Threading.Tasks;
 

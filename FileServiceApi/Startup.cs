@@ -1,8 +1,6 @@
 ﻿using Autofac;
-using FileServiceApi.Data;
-using FileServiceApi.FileStorers;
+using FileServiceApi.Extensions;
 using FileServiceApi.Models;
-using FileServiceApi.Services;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
@@ -43,7 +41,9 @@ namespace FileServiceApi
                 app.UseHsts();
             }
 
-            app.UseHttpsRedirection();
+            app.ConfigureGlobalExceptionHandler();
+
+            //app.UseHttpsRedirection();
             app.UseMvc();
         }
 

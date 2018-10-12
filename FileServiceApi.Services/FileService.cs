@@ -3,12 +3,12 @@ using FileServiceApi.FileStorers;
 using FileServiceApi.Models;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Options;
+using Newtonsoft.Json;
 using Serilog;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Threading.Tasks;
-using Newtonsoft.Json;
 
 namespace FileServiceApi.Services
 {
@@ -40,53 +40,45 @@ namespace FileServiceApi.Services
         {
             var success = false;
             var fileMetaDatas = new List<FileMetaData>();
-            try
+
+            foreach (var formFile in filesIn)
             {
-                foreach (var formFile in filesIn)
+                if (formFile.Length <= 0) continue;
+
+                Log.Information($"Uploading file: {formFile.FileName}.");
+
+                var fileMetaData = new FileMetaData
                 {
-                    if (formFile.Length <= 0) continue;
+                    FileName = formFile.FileName,
+                    FileType = formFile.ContentType,
+                    FileGuid = CreateFileGuid(),
+                    UploadDate = DateTime.Now
+                };
 
-                    Log.Information($"Uploading file: {formFile.FileName}.");
+                fileMetaDatas.Add(fileMetaData);
 
-                    var fileMetaData = new FileMetaData
-                    {
-                        FileName = formFile.FileName,
-                        FileType = formFile.ContentType,
-                        FileGuid = CreateFileGuid(),
-                        UploadDate = DateTime.Now
-                    };
-
-                    fileMetaDatas.Add(fileMetaData);
-
-                    if (_configurationSettings.Value.ServiceType == "default")
-                    {
-                        //Use the LocalFileStorer to write to local disk
-                        success = _localFileStorer.WriteFile(formFile, fileMetaData.FileGuid, _configurationSettings.Value.LocalStoragePath);
-                    }
-                    else
-                    {
-                        success = await _minioFileStorer.UploadFile(fileMetaData.FileGuid, formFile.OpenReadStream(), fileMetaData.FileType);
-                    }
-                }
-
-                if (!success) return null;
+                if (_configurationSettings.Value.ServiceType == "default")
                 {
-                    _mongoDbService.InsertFileDatas(fileMetaDatas);
-
-                    var returnGuids = new List<string>();
-                    foreach (var fileMetaData in fileMetaDatas)
-                    {
-                        returnGuids.Add(fileMetaData.FileGuid);
-                    }
-
-                    return returnGuids;
+                    //Use the LocalFileStorer to write to local disk
+                    success = _localFileStorer.WriteFile(formFile, fileMetaData.FileGuid, _configurationSettings.Value.LocalStoragePath);
                 }
-
+                else
+                {
+                    success = await _minioFileStorer.UploadFile(fileMetaData.FileGuid, formFile.OpenReadStream(), fileMetaData.FileType);
+                }
             }
-            catch (Exception exception)
+
+            if (!success) return null;
             {
-                Log.Error(exception, "Failed to store file externally.");
-                return null;
+                _mongoDbService.InsertFileDatas(fileMetaDatas);
+
+                var returnGuids = new List<string>();
+                foreach (var fileMetaData in fileMetaDatas)
+                {
+                    returnGuids.Add(fileMetaData.FileGuid);
+                }
+
+                return returnGuids;
             }
         }
         /// <inheritdoc />
@@ -162,18 +154,10 @@ namespace FileServiceApi.Services
             var currentDirectory = Directory.GetCurrentDirectory();
             List<FileContentType> contentTypes;
 
-            try
+            using (var streamReader = new StreamReader($"{currentDirectory}/{_configurationSettings.Value.WhitelistFile}"))
             {
-                using (var streamReader = new StreamReader($"{currentDirectory}/{_configurationSettings.Value.WhitelistFile}"))
-                {
-                    var json = streamReader.ReadToEnd();
-                    contentTypes = JsonConvert.DeserializeObject<List<FileContentType>>(json);
-                }
-            }
-            catch (Exception exception)
-            {
-                Log.Error(exception, "Failed to get list of content-types for whitelist.");
-                return null;
+                var json = streamReader.ReadToEnd();
+                contentTypes = JsonConvert.DeserializeObject<List<FileContentType>>(json);
             }
 
             return contentTypes;

@@ -40,23 +40,16 @@ namespace FileServiceApi.FileStorers
         {
             if (File.Exists(filePath + fileGuid))
             {
-                var exception = new IOException("File already exists");
+                var exception = new IOException("File already exists"); //TODO: to throw or not to throw?
                 Log.Error(exception, $"Cannot save file: {fileGuid}, because it already exists in storage location.");
                 return false;
             }
-            try
+
+            using (var fileStream = new FileStream(filePath + fileGuid, FileMode.OpenOrCreate))
             {
-                using (var fileStream = new FileStream(filePath + fileGuid, FileMode.OpenOrCreate))
-                {
-                    Log.Information($"Saving file: {fileGuid} to local storage.");
-                    file.CopyTo(fileStream);
-                    return true;
-                }
-            }
-            catch (Exception exception)
-            {
-                Log.Error(exception, $"An error occurred while trying to save file: {fileGuid} to local storage.");
-                return false;
+                Log.Information($"Saving file: {fileGuid} to local storage.");
+                file.CopyTo(fileStream);
+                return true;
             }
         }
 
@@ -85,17 +78,9 @@ namespace FileServiceApi.FileStorers
         /// where the file is stored.</param>
         public bool DeleteFile(string fileGuid, string filePath)
         {
-            try
-            {
-                Log.Information($"Deleting file: {fileGuid} from local storage.");
-                File.Delete(filePath + fileGuid);
-                return true;
-            }
-            catch (Exception exception)
-            {
-                Log.Error(exception, $"An error occurred while attempting to delete file: {fileGuid} from local storage.");
-                return false;
-            }
+            Log.Information($"Deleting file: {fileGuid} from local storage.");
+            File.Delete(filePath + fileGuid);
+            return true;
         }
     }
 }

@@ -2,11 +2,9 @@
 using FileServiceApi.Services;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore.Internal;
 using Microsoft.Extensions.Options;
 using Microsoft.Net.Http.Headers;
 using Serilog;
-using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -14,7 +12,7 @@ using System.Threading.Tasks;
 
 namespace FileServiceApi.Controllers
 {
-    [Route("api/[controller]")]
+    [Route("[controller]")]
     [ApiController]
     public class FilesController : ControllerBase
     {
@@ -31,7 +29,7 @@ namespace FileServiceApi.Controllers
             _maxFileSize = _configurationSettings.Value.MaxUploadFileSize * 1048576;
         }
 
-        // GET api/files
+        // GET files
         [HttpGet]
         public async Task<string> Get()
         {
@@ -48,7 +46,7 @@ namespace FileServiceApi.Controllers
             return returnText;
         }
 
-        // GET api/files/5
+        // GET files/5
         [HttpGet("{id}")]
         public async Task<FileResult> Get(string id)
         {
@@ -62,7 +60,7 @@ namespace FileServiceApi.Controllers
             return stream == null ? null : File(stream, fileData.FileType, fileData.FileName, null, EntityTagHeaderValue.Any, true);
         }
 
-        // POST api/files/upload
+        // POST files/upload
         [HttpPost("upload")]
         public async Task<IActionResult> Post([FromForm]List<IFormFile> files)
         {
@@ -78,21 +76,13 @@ namespace FileServiceApi.Controllers
                 {
                     var uploadedFileCount = _fileService.GetNumberOfFilesInStorage();
 
-                    try
-                    {
-                        var maxFiles = int.Parse(_configurationSettings.Value.MaxFileUploadLimit);
+                    var maxFiles = int.Parse(_configurationSettings.Value.MaxFileUploadLimit);
 
-                        if (uploadedFileCount.Result >= maxFiles)
-                        {
-                            var errorString = $"File upload would exceed the maximum number of files: {_configurationSettings.Value.MaxFileUploadLimit}";
-                            Log.Error(errorString);
-                            return StatusCode(406, errorString);
-                        }
-                    }
-                    catch (Exception exception)
+                    if (uploadedFileCount.Result >= maxFiles)
                     {
-                        Log.Error(exception, "The MaxFileUploadLimit configuration setting must be either NO_UPLOAD_LIMIT or a number");
-                        throw;
+                        var errorString = $"File upload would exceed the maximum number of files: {_configurationSettings.Value.MaxFileUploadLimit}";
+                        Log.Error(errorString);
+                        return StatusCode(406, errorString);
                     }
                 }
 
@@ -124,7 +114,7 @@ namespace FileServiceApi.Controllers
             return StatusCode(500);
         }
 
-        // DELETE api/files/5
+        // DELETE files/5
         [HttpDelete("{id}")]
         public async Task<IActionResult> Delete(string id)
         {

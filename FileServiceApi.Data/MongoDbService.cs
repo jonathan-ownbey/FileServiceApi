@@ -1,10 +1,10 @@
-﻿using System;
-using FileServiceApi.Models;
-using System.Collections.Generic;
-using System.Threading.Tasks;
+﻿using FileServiceApi.Models;
 using Microsoft.Extensions.Options;
 using MongoDB.Driver;
 using Serilog;
+using System;
+using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace FileServiceApi.Data
 {
@@ -14,20 +14,13 @@ namespace FileServiceApi.Data
 
         public MongoDbService(IOptions<ConfigurationSettings> configurationSettings)
         {
-            Log.Information("Creating MongoDB service.");   
-            try
-            {
-                var mongoClient = new MongoClient(configurationSettings.Value.MongoConnectionString);
-                var database = mongoClient.GetDatabase(configurationSettings.Value.MongoDatabaseName);
-                _collection = database.GetCollection<FileMetaData>(configurationSettings.Value.MongoCollectionName);
+            Log.Information("Creating MongoDB service.");
 
-                Log.Information("Successfully created MongoDB service.");
-            }
-            catch (Exception exception)
-            {
-                Log.Error(exception, "Failed to create MongoDB service.");
-                throw;
-            }
+            var mongoClient = new MongoClient(configurationSettings.Value.MongoConnectionString);
+            var database = mongoClient.GetDatabase(configurationSettings.Value.MongoDatabaseName);
+            _collection = database.GetCollection<FileMetaData>(configurationSettings.Value.MongoCollectionName);
+
+            Log.Information("Successfully created MongoDB service.");
         }
 
         /// <inheritdoc />
@@ -38,18 +31,11 @@ namespace FileServiceApi.Data
         /// <param name="fileMetaDatas">A list of FileMetaData to be stored in the db.</param>
         public void InsertFileDatas(List<FileMetaData> fileMetaDatas)
         {
-            try
-            {
-                Log.Information($"Inserting list of FileMetaData: {fileMetaDatas} in MongoDB.");
+            Log.Information($"Inserting list of FileMetaData: {fileMetaDatas} in MongoDB.");
 
-                _collection.InsertManyAsync(fileMetaDatas);
+            _collection.InsertManyAsync(fileMetaDatas);
 
-                Log.Information("List of FileMetaData inserted successfully.");
-            }
-            catch (Exception exception)
-            {
-                Log.Error(exception, "Failed to insert List of FileMetaData.");
-            }
+            Log.Information("List of FileMetaData inserted successfully.");
         }
         /// <inheritdoc />
         /// <summary>
@@ -65,22 +51,15 @@ namespace FileServiceApi.Data
             var filterDef = new FilterDefinitionBuilder<FileMetaData>();
             var filter = filterDef.In(x => x.FileGuid, fileNames);
 
-            try
-            {
-                Log.Information($"Retrieving List of FileMetaData for List of guids: {fileNames}.");
+            Log.Information($"Retrieving List of FileMetaData for List of guids: {fileNames}.");
 
-                using (var cursor = await _collection.FindAsync(filter))
-                {
-                    while (await cursor.MoveNextAsync())
-                        fileMetaDatas.AddRange(cursor.Current);
-                }
-
-                Log.Information("Successfully retrieved list of FileMetaData.");
-            }
-            catch (Exception exception)
+            using (var cursor = await _collection.FindAsync(filter))
             {
-                Log.Error(exception, "Failed to retrieve List of FileMetaData.");
+                while (await cursor.MoveNextAsync())
+                    fileMetaDatas.AddRange(cursor.Current);
             }
+
+            Log.Information("Successfully retrieved list of FileMetaData.");
 
             return fileMetaDatas;
         }
@@ -91,23 +70,19 @@ namespace FileServiceApi.Data
         /// <returns>Task of type List of FileMetaData containing file info.</returns>
         public async Task<List<FileMetaData>> GetAllFileMetaDatas()
         {
-            var fileMetaDatas = new List<FileMetaData>();
-            try
-            {
-                Log.Information($"Retrieving List of FileMetaData for all files.");
-                using (var cursor = await _collection.FindAsync(FilterDefinition<FileMetaData>.Empty))
-                {
-                    while (await cursor.MoveNextAsync())
-                        fileMetaDatas.AddRange(cursor.Current);
-                }
+            //TODO: Fix the file service to check for empty list instead of null.
+            List<FileMetaData> fileMetaDatas = null;
 
-                return fileMetaDatas;
-            }
-            catch (Exception exception)
+            Log.Information($"Retrieving List of FileMetaData for all files.");
+            using (var cursor = await _collection.FindAsync(FilterDefinition<FileMetaData>.Empty))
             {
-                Log.Error(exception, "An error occurred while retrieving FileMetaData for all files.");
-                return null;
+                fileMetaDatas = new List<FileMetaData>();
+
+                while (await cursor.MoveNextAsync())
+                    fileMetaDatas.AddRange(cursor.Current);
             }
+
+            return fileMetaDatas;
         }
         /// <inheritdoc />
         /// <summary>
@@ -122,19 +97,12 @@ namespace FileServiceApi.Data
             var success = false;
             foreach (var fileGuid in fileNames)
             {
-                try
-                {
-                    Log.Information($"Setting file: {fileGuid} to deleted in MongoDB.");
-                    var updateDef = Builders<FileMetaData>.Update.Set(x => x.IsDeleted, true);
-                    await _collection.UpdateOneAsync(x => x.FileGuid == fileGuid, updateDef);
-                    success = true;
-                }
-                catch (Exception exception)
-                {
-                    Log.Error(exception, $"An error occurred when setting file: {fileGuid} to deleted in MongoDB.");
-                    return false;
-                }
+                Log.Information($"Setting file: {fileGuid} to deleted in MongoDB.");
+                var updateDef = Builders<FileMetaData>.Update.Set(x => x.IsDeleted, true);
+                await _collection.UpdateOneAsync(x => x.FileGuid == fileGuid, updateDef);
+                success = true;
             }
+
             return success;
         }
         /// <inheritdoc />
@@ -144,19 +112,12 @@ namespace FileServiceApi.Data
         /// <returns>Int representing the total number of records in the MongoDB collection.</returns>
         public async Task<int> GetTotalNumberOfFiles()
         {
-            try
-            {
-                Log.Information("Getting file count from MongoDB.");
-                var filterDef = new FilterDefinitionBuilder<FileMetaData>();
-                var filter = filterDef.Where(x => x.IsDeleted == false);
+            Log.Information("Getting file count from MongoDB.");
 
-                return (int)await _collection.CountDocumentsAsync(filter);
-            }
-            catch (Exception exception)
-            {
-                Log.Error(exception, "An error occurred while attempting to get file count in MongoDB.");
-                return -1;
-            }
+            var filterDef = new FilterDefinitionBuilder<FileMetaData>();
+            var filter = filterDef.Where(x => x.IsDeleted == false);
+
+            return (int)await _collection.CountDocumentsAsync(filter);
         }
     }
 }
