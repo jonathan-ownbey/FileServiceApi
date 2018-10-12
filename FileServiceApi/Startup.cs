@@ -1,4 +1,5 @@
-﻿using FileServiceApi.Data;
+﻿using Autofac;
+using FileServiceApi.Data;
 using FileServiceApi.FileStorers;
 using FileServiceApi.Models;
 using FileServiceApi.Services;
@@ -23,9 +24,9 @@ namespace FileServiceApi
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
-            services.AddScoped<IFileService, FileService>();
-            services.AddScoped<IMinioFileStorer, MinioFileStorer>();
-            services.AddScoped<IMongoDbService, MongoDbService>();
+            //services.AddScoped<IFileService, FileService>();
+            //services.AddScoped<IMinioFileStorer, MinioFileStorer>();
+            //services.AddScoped<IMongoDbService, MongoDbService>();
             
             services.Configure<ConfigurationSettings>(Configuration.GetSection("ConfigurationSettings"));
         }
@@ -52,9 +53,9 @@ namespace FileServiceApi
         // Don't build the container; that gets done for you. If you
         // need a reference to the container, you need to use the
         // "Without ConfigureContainer" mechanism shown later.
-        //public void ConfigureContainer(ContainerBuilder builder)
-        //{
-        //    builder.RegisterModule(new AutofacModule());
-        //}
+        public void ConfigureContainer(ContainerBuilder builder)
+        {
+            builder.RegisterModule(new AutofacModule());
+        }
     }
 }

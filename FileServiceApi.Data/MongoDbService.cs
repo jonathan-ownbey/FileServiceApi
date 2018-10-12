@@ -14,7 +14,7 @@ namespace FileServiceApi.Data
 
         public MongoDbService(IOptions<ConfigurationSettings> configurationSettings)
         {
-            Log.Information("Creating MongoDB service.");
+            Log.Information("Creating MongoDB service.");   
             try
             {
                 var mongoClient = new MongoClient(configurationSettings.Value.MongoConnectionString);

@@ -1,0 +1,16 @@
+2018-10-12 15:23:05.946 -04:00 [INF] Incorrect or no service type defined in appsettings.json.
+2018-10-12 15:23:05.995 -04:00 [INF] Creating MongoDB service.
+2018-10-12 15:23:06.403 -04:00 [INF] Successfully created MongoDB service.
+2018-10-12 15:23:06.420 -04:00 [INF] Retrieving List of FileMetaData for all files.
+2018-10-12 15:24:25.230 -04:00 [INF] Incorrect or no service type defined in appsettings.json.
+2018-10-12 15:24:25.230 -04:00 [INF] Creating MongoDB service.
+2018-10-12 15:24:25.237 -04:00 [INF] Successfully created MongoDB service.
+2018-10-12 15:24:25.429 -04:00 [INF] Uploading file: 20180429_115613.jpg.
+2018-10-12 15:24:25.432 -04:00 [INF] Uploading file: 87f15cce-a1cd-4e1b-a23b-834e0a5e0532 to bucket: demofileservice.
+2018-10-12 15:24:25.434 -04:00 [INF] Creating bucket: demofileservice.
+2018-10-12 15:24:25.529 -04:00 [ERR] Failed to create bucket: demofileservice.
+System.NullReferenceException: Object reference not set to an instance of an object.
+   at FileServiceApi.FileStorers.MinioFileStorer.CreateBucket(String bucketName, String location) in C:\Users\Jon Ownbey\source\repos\FileServiceApi\FileServiceApi.FileStorers\MinioFileStorer.cs:line 144
+2018-10-12 15:24:25.570 -04:00 [INF] Upload succeeded.
+2018-10-12 15:24:25.570 -04:00 [INF] Inserting list of FileMetaData: System.Collections.Generic.List`1[FileServiceApi.Models.FileMetaData] in MongoDB.
+2018-10-12 15:24:25.692 -04:00 [INF] List of FileMetaData inserted successfully.

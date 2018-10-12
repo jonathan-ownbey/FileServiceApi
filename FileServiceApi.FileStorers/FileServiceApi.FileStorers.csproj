@@ -5,6 +5,8 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="Autofac" Version="4.8.1" />
+    <PackageReference Include="Autofac.Extensions.DependencyInjection" Version="4.3.0" />
     <PackageReference Include="AWSSDK.Core" Version="3.3.25.3" />
     <PackageReference Include="AWSSDK.S3" Version="3.3.23.2" />
     <PackageReference Include="Microsoft.AspNetCore.Http.Features" Version="1.1.0" />

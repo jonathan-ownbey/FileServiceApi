@@ -9,7 +9,7 @@ namespace FileServiceApi.FileStorers
     /// <summary>
     /// A file storer for local file storage.
     /// </summary>
-    public class LocalFileStorer : ILocalFileStorer
+    public sealed class LocalFileStorer : ILocalFileStorer
     {
         private LocalFileStorer()
         { }
