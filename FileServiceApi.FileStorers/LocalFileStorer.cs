@@ -1,6 +1,5 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Serilog;
-using System;
 using System.IO;
 
 namespace FileServiceApi.FileStorers

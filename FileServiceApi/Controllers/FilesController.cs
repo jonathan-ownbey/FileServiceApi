@@ -48,9 +48,13 @@ namespace FileServiceApi.Controllers
 
         // GET files/5
         [HttpGet("{id}")]
-        public async Task<FileResult> Get(string id)
+        public async Task<IActionResult> Get(string id)
         {
             var stream = await _fileService.GetFile(id);
+
+            // Short circuit and return 401 if the file is not found.
+            if (stream == null) return Unauthorized();
+
             var fileMetaDatas = await _fileService.GetFileMetaData(new List<string> { id });
             var fileData = fileMetaDatas[0];
 
