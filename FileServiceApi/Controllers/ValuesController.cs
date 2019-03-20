@@ -1,5 +1,8 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using System.Collections.Generic;
+using FileServiceApi.Models;
+using FileServiceApi.Services;
+using Newtonsoft.Json;
 
 namespace FileServiceApi.Controllers
 {
@@ -7,36 +10,33 @@ namespace FileServiceApi.Controllers
     [ApiController]
     public class ValuesController : ControllerBase
     {
-        // GET api/values
+        private readonly ConfigurationSettings _configurationSettings;
+        private readonly IFileService _fileService;
+
+        public ValuesController(IFileService fileService, ConfigurationSettings configurationSettings)
+        {
+            _configurationSettings = configurationSettings;
+            _fileService = fileService;
+        }
+
         [HttpGet]
-        public ActionResult<IEnumerable<string>> Get()
+        public string Get()
         {
-            return new string[] { "value1", "value2" };
-        }
+            var uploadWhiteList = new UploadWhiteList
+            {
+                MaxFileUploadLimit = _configurationSettings.MaxFileUploadLimit,
+                MaxFileUploadSize = _configurationSettings.MaxUploadFileSize.ToString(),
+                ContentTypes = _fileService.GetAllowedFileTypes()
+            };
 
-        // GET api/values/5
-        [HttpGet("{id}")]
-        public ActionResult<string> Get(int id)
-        {
-            return "value";
+            return JsonConvert.SerializeObject(uploadWhiteList);
         }
+    }
 
-        // POST api/values
-        [HttpPost]
-        public void Post([FromBody] string value)
-        {
-        }
-
-        // PUT api/values/5
-        [HttpPut("{id}")]
-        public void Put(int id, [FromBody] string value)
-        {
-        }
-
-        // DELETE api/values/5
-        [HttpDelete("{id}")]
-        public void Delete(int id)
-        {
-        }
+    internal class UploadWhiteList
+    {
+        public List<FileContentType> ContentTypes;
+        public string MaxFileUploadSize;
+        public string MaxFileUploadLimit;
     }
 }

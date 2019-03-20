@@ -4,7 +4,9 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
 using Microsoft.Net.Http.Headers;
+using Newtonsoft.Json;
 using Serilog;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -68,18 +70,21 @@ namespace FileServiceApi.Controllers
         [HttpPost("upload")]
         public async Task<IActionResult> Post([FromForm]List<IFormFile> files)
         {
+            // In some instances I've seen inconsistent behavior. This is a fix for that.
             if (files.Count == 0)
                 if (Request.HasFormContentType)
                     files = Request.Form.Files.ToList();
 
-            if (files.Count > 0)
+            if (files.Count <= 0) return NoContent();
+
+            var allowedFileTypes = _fileService.GetAllowedFileTypes();
+
+            if (_configurationSettings.Value.MaxFileUploadLimit != MaxNumberOfFiles)
             {
-                var allowedFileTypes = _fileService.GetAllowedFileTypes();
+                var uploadedFileCount = _fileService.GetNumberOfFilesInStorage();
 
-                if (_configurationSettings.Value.MaxFileUploadLimit != MaxNumberOfFiles)
+                try
                 {
-                    var uploadedFileCount = _fileService.GetNumberOfFilesInStorage();
-
                     var maxFiles = int.Parse(_configurationSettings.Value.MaxFileUploadLimit);
 
                     if (uploadedFileCount.Result >= maxFiles)
@@ -89,33 +94,37 @@ namespace FileServiceApi.Controllers
                         return StatusCode(406, errorString);
                     }
                 }
-
-                foreach (var file in files)
+                catch (Exception exception)
                 {
-                    if (file.Length > _maxFileSize)
-                    {
-                        var errorString = $"File failed to upload, max file size is {_maxFileSize}MB";
-                        Log.Error(errorString);
-                        return StatusCode(413, errorString);
-                    }
-
-                    if (!allowedFileTypes.Any(x => x.Extension.Equals(Path.GetExtension(file.FileName))))
-                    {
-                        var errorString = $"File with content-type: {file.ContentType} is not allowed.";
-                        Log.Error(errorString);
-                        return StatusCode(415, errorString);
-                    }
+                    Log.Error(exception, "The MaxFileUploadLimit configuration setting must be either NO_UPLOAD_LIMIT or a positive number.");
+                    throw;
                 }
-                var guids = await _fileService.StoreFiles(files);
-                if (guids != null)
-                    return Ok(string.Join(",", guids));
-            }
-            else
-            {
-                return NoContent();
             }
 
-            return StatusCode(500);
+            foreach (var file in files)
+            {
+                if (file.Length > _maxFileSize)
+                {
+                    var errorString = $"File failed to upload, max file size is {_maxFileSize}MB";
+                    Log.Error(errorString);
+                    return StatusCode(413, errorString);
+                }
+
+                // Note: This could check content type also, but presents a different set of issues wherein 
+                //       some files will read as application/octet-stream which can be misleading.
+                if (!allowedFileTypes.Any(x => x.Extension.Equals(Path.GetExtension(file.FileName))))
+                {
+                    var errorString = $"File with content-type: {file.ContentType} is not allowed.";
+                    Log.Error(errorString);
+                    return StatusCode(415, errorString);
+                }
+            }
+            var guids = await _fileService.StoreFiles(files);
+            if (guids == null) return NoContent();
+
+            var returnObjects = guids.Select(x => new { id = x }).ToList();
+
+            return Ok(JsonConvert.SerializeObject(returnObjects));
         }
 
         // DELETE files/5
@@ -125,7 +134,7 @@ namespace FileServiceApi.Controllers
             if (await _fileService.DeleteFile(id))
                 return Ok();
 
-            return StatusCode(500);
+            return Unauthorized();
         }
     }
 }
