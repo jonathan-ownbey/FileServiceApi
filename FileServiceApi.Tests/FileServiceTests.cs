@@ -3,7 +3,6 @@ using FileServiceApi.FileStorers;
 using FileServiceApi.Models;
 using FileServiceApi.Services;
 using Microsoft.AspNetCore.Http;
-using Microsoft.Extensions.Options;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
 using System.Collections.Generic;
@@ -16,16 +15,14 @@ namespace FileServiceApi.Tests
     public class FileServiceTests
     {
         private Mock<IFormFile> _mockFormFile = new Mock<IFormFile>();
-        private Mock<IOptions<ConfigurationSettings>> _mockConfigurationSettings;
-        private Mock<ILocalFileStorer> _mockLocalFileStorer;
+        private Mock<ConfigurationSettings> _mockConfigurationSettings;
         private Mock<IMinioFileStorer> _mockMinioStorer;
         private Mock<IMongoDbService> _mockMongoDbService;
 
         [TestInitialize]
         public void SetupTests()
         {
-            _mockConfigurationSettings = new Mock<IOptions<ConfigurationSettings>>();
-            _mockLocalFileStorer = new Mock<ILocalFileStorer>();
+            _mockConfigurationSettings = new Mock<ConfigurationSettings>();
             _mockMinioStorer = new Mock<IMinioFileStorer>();
             _mockMongoDbService = new Mock<IMongoDbService>();
             SetupFile();
@@ -34,12 +31,11 @@ namespace FileServiceApi.Tests
         [TestMethod]
         public async Task StoreFiles_Successfully_Returns_List()
         {
-            var fileList = new List<IFormFile> {_mockFormFile.Object};
-            _mockLocalFileStorer.Setup(x => x.WriteFile(It.IsAny<IFormFile>(), It.IsAny<string>(), It.IsAny<string>())).Returns(true);
+            var fileList = new List<IFormFile> { _mockFormFile.Object };
             _mockMinioStorer.Setup(x => x.UploadFile(It.IsAny<string>(), It.IsAny<Stream>(), It.IsAny<string>())).Returns(Task.FromResult(true));
             _mockMongoDbService.Setup(x => x.InsertFileDatas(It.IsAny<List<FileMetaData>>()));
 
-            var fileService = new FileService(_mockLocalFileStorer.Object, _mockMinioStorer.Object, _mockMongoDbService.Object, _mockConfigurationSettings.Object);
+            var fileService = new FileService(null, _mockMinioStorer.Object, _mockMongoDbService.Object, _mockConfigurationSettings.Object);
 
             var result = await fileService.StoreFiles(fileList);
 

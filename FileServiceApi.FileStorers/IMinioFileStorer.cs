@@ -28,7 +28,5 @@ namespace FileServiceApi.FileStorers
         /// <param name="fileName">A string, name fo the file which is stored.</param>
         /// <returns>A boolean to represent success.</returns>
         Task<bool> DeleteFile(string fileName);
-
-        // TODO: Add listing files.
     }
 }

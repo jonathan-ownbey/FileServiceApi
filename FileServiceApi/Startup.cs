@@ -42,8 +42,7 @@ namespace FileServiceApi
             }
 
             app.ConfigureGlobalExceptionHandler();
-
-            //app.UseHttpsRedirection();
+            
             app.UseMvc();
         }
 

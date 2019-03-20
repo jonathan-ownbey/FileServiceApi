@@ -176,3 +176,6 @@ System.NullReferenceException: Object reference not set to an instance of an obj
 2018-10-12 19:43:30.588 -04:00 [INF] Upload succeeded.
 2018-10-12 19:43:30.589 -04:00 [INF] Inserting list of FileMetaData: System.Collections.Generic.List`1[FileServiceApi.Models.FileMetaData] in MongoDB.
 2018-10-12 19:43:30.716 -04:00 [INF] List of FileMetaData inserted successfully.
+2019-03-20 17:56:03.368 -04:00 [INF] Creating MongoDB service.
+2019-03-20 17:56:03.776 -04:00 [INF] Successfully created MongoDB service.
+2019-03-20 17:56:03.787 -04:00 [INF] Retrieving List of FileMetaData for all files.

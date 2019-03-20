@@ -54,5 +54,11 @@ namespace FileServiceApi.Services
         /// </summary>
         /// <returns>An int which represents the count of files uploaded.</returns>
         Task<int> GetNumberOfFilesInStorage();
+        /// <summary>
+        /// A helper function to make file sizes more readable.
+        /// </summary>
+        /// <param name="bytesLength">An int representation of the bytes length of a file.</param>
+        /// <returns>A string representation of the file size such as 25MB</returns>
+        string GetReadableSize(int bytesLength);
     }
 }

@@ -14,13 +14,13 @@ namespace FileServiceApi.Services
 {
     public class FileService : IFileService
     {
-        private readonly IOptions<ConfigurationSettings> _configurationSettings;
+        private readonly ConfigurationSettings _configurationSettings;
         private readonly ILocalFileStorer _localFileStorer;
         private readonly IMinioFileStorer _minioFileStorer;
         private readonly IMongoDbService _mongoDbService;
 
         public FileService(ILocalFileStorer localFileStorer, IMinioFileStorer minioFileStorer, IMongoDbService mongoDbService,
-            IOptions<ConfigurationSettings> configurationSettings)
+            ConfigurationSettings configurationSettings)
         {
             _localFileStorer = localFileStorer;
             _minioFileStorer = minioFileStorer;
@@ -57,10 +57,10 @@ namespace FileServiceApi.Services
 
                 fileMetaDatas.Add(fileMetaData);
 
-                if (_configurationSettings.Value.ServiceType == "default")
+                if (string.Equals(_configurationSettings.ServiceType, "default", StringComparison.CurrentCultureIgnoreCase))
                 {
                     //Use the LocalFileStorer to write to local disk
-                    success = _localFileStorer.WriteFile(formFile, fileMetaData.FileGuid, _configurationSettings.Value.LocalStoragePath);
+                    success = _localFileStorer.WriteFile(formFile, fileMetaData.FileGuid, _configurationSettings.LocalStoragePath);
                 }
                 else
                 {
@@ -91,9 +91,9 @@ namespace FileServiceApi.Services
         /// <returns>A Task of type Stream containing the file data.</returns>
         public async Task<Stream> GetFile(string fileGuid)
         {
-            if (_configurationSettings.Value.ServiceType == "default")
+            if (_configurationSettings.ServiceType == "default")
             {
-                return _localFileStorer.ReturnFile(fileGuid, _configurationSettings.Value.LocalStoragePath);
+                return _localFileStorer.ReturnFile(fileGuid, _configurationSettings.LocalStoragePath);
             }
 
             return await _minioFileStorer.RetrieveFile(fileGuid);
@@ -107,9 +107,9 @@ namespace FileServiceApi.Services
         {
             var success = false;
 
-            if (_configurationSettings.Value.ServiceType == "default")
+            if (_configurationSettings.ServiceType == "default")
             {
-                if (_localFileStorer.DeleteFile(fileGuid, _configurationSettings.Value.LocalStoragePath))
+                if (_localFileStorer.DeleteFile(fileGuid, _configurationSettings.LocalStoragePath))
                     return true;
             }
             else
@@ -154,10 +154,18 @@ namespace FileServiceApi.Services
             var currentDirectory = Directory.GetCurrentDirectory();
             List<FileContentType> contentTypes;
 
-            using (var streamReader = new StreamReader($"{currentDirectory}/{_configurationSettings.Value.WhitelistFile}"))
+            try
             {
-                var json = streamReader.ReadToEnd();
-                contentTypes = JsonConvert.DeserializeObject<List<FileContentType>>(json);
+                using (var streamReader = new StreamReader($"{currentDirectory}/{_configurationSettings.WhitelistFile}"))
+                {
+                    var json = streamReader.ReadToEnd();
+                    contentTypes = JsonConvert.DeserializeObject<List<FileContentType>>(json);
+                }
+            }
+            catch (Exception exception)
+            {
+                Log.Error(exception, "Failed to get list of extensions for whitelist.");
+                return null;
             }
 
             return contentTypes;
@@ -179,6 +187,59 @@ namespace FileServiceApi.Services
         public string CreateFileGuid()
         {
             return Guid.NewGuid().ToString();
+        }
+
+        /// <inheritdoc />
+        /// <summary>
+        /// A helper function to make file sizes more readable.
+        /// </summary>
+        /// <param name="bytesLength">An int representation of the bytes length of a file.</param>
+        /// <returns>A string representation of the file size such as 25MB</returns>
+        public string GetReadableSize(int bytesLength)
+        {
+            // Get absolute value 
+            long absoluteLength = bytesLength < 0 ? -bytesLength : bytesLength;
+            // Determine the suffix and readable value 
+            string suffix;
+            double readable;
+            if (absoluteLength >= 0x1000000000000000) // Exabyte 
+            {
+                suffix = "E";
+                readable = bytesLength >> 50;
+            }
+            else if (absoluteLength >= 0x4000000000000) // Petabyte 
+            {
+                suffix = "P";
+                readable = bytesLength >> 40;
+            }
+            else if (absoluteLength >= 0x10000000000) // Terabyte 
+            {
+                suffix = "T";
+                readable = bytesLength >> 30;
+            }
+            else if (absoluteLength >= 0x40000000) // Gigabyte 
+            {
+                suffix = "G";
+                readable = bytesLength >> 20;
+            }
+            else if (absoluteLength >= 0x100000) // Megabyte 
+            {
+                suffix = "M";
+                readable = bytesLength >> 10;
+            }
+            else if (absoluteLength >= 0x400) // Kilobyte 
+            {
+                suffix = "K";
+                readable = bytesLength;
+            }
+            else
+            {
+                return bytesLength.ToString("0 B"); // Byte 
+            }
+            // Divide by 1024 to get fractional value 
+            readable = readable / 1024;
+            // Return formatted number with suffix 
+            return readable.ToString("0.### ") + suffix;
         }
     }
 }

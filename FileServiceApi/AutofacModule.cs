@@ -15,7 +15,7 @@ namespace FileServiceApi
             builder.Register(c => new MinioFileStorer(c.Resolve<IOptions<ConfigurationSettings>>())).As<IMinioFileStorer>();
             builder.Register(c => new MongoDbService(c.Resolve<IOptions<ConfigurationSettings>>())).As<IMongoDbService>();
             builder.Register(c => new FileService(c.Resolve<ILocalFileStorer>(), c.Resolve<IMinioFileStorer>(),
-                c.Resolve<IMongoDbService>(), c.Resolve<IOptions<ConfigurationSettings>>())).As<IFileService>();
+                c.Resolve<IMongoDbService>(), c.Resolve<ConfigurationSettings>())).As<IFileService>();
         }
     }
 }

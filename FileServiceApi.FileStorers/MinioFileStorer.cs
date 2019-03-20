@@ -49,8 +49,10 @@ namespace FileServiceApi.FileStorers
         public async Task<bool> UploadFile(string fileName, Stream data, string contentType)
         {
             Log.Information($"Uploading file: {fileName} to bucket: {_configurationSettings.Value.BucketName}.");
-            if (await CreateBucket(_configurationSettings.Value.BucketName, _configurationSettings.Value.MinioRegion))
-                await _minioClient.PutObjectAsync(_configurationSettings.Value.BucketName, fileName, data, data.Length, contentType);
+            if (!await CreateBucket(_configurationSettings.Value.BucketName, _configurationSettings.Value.MinioRegion))
+                return false;
+
+            await _minioClient.PutObjectAsync(_configurationSettings.Value.BucketName, fileName, data, data.Length, contentType);
 
 
             Log.Information("Upload succeeded.");
@@ -66,12 +68,20 @@ namespace FileServiceApi.FileStorers
         public async Task<Stream> RetrieveFile(string fileName)
         {
             Log.Information($"Retrieving file: {fileName}, from bucket: {_configurationSettings.Value.BucketName}.");
-            Stream returnStream = new MemoryStream();
+            Stream returnStream = null;
             // Check whether the object exists using statObject().
             // If the object is not found, statObject() throws an exception,
             // else it means that the object exists.
             // Execution is successful.
-            await _minioClient.StatObjectAsync(_configurationSettings.Value.BucketName, fileName);
+            try
+            {
+                await _minioClient.StatObjectAsync(_configurationSettings.Value.BucketName, fileName);
+            }
+            catch (Exception exception)
+            {
+                if (exception.Message.Contains("Not found")) return null;
+            }
+            
 
             // Get input stream to have content of 'fileName' from 'bucketName'
             await _minioClient.GetObjectAsync(_configurationSettings.Value.BucketName, fileName,
@@ -94,7 +104,14 @@ namespace FileServiceApi.FileStorers
         public async Task<bool> DeleteFile(string fileName)
         {
             Log.Information($"Deleting file: {fileName} from bucket: {_configurationSettings.Value.BucketName}.");
-            await _minioClient.RemoveObjectAsync(_configurationSettings.Value.BucketName, fileName);
+            try
+            {
+                await _minioClient.RemoveObjectAsync(_configurationSettings.Value.BucketName, fileName);
+            }
+            catch (Exception exception)
+            {
+                if (exception.Message.Contains("does not exist")) return false;
+            }
             return true;
         }
 
