@@ -1,17 +1,17 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFramework>netcoreapp2.2</TargetFramework>
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Autofac" Version="4.9.1" />
+    <PackageReference Include="Autofac" Version="4.9.2" />
     <PackageReference Include="Autofac.Extensions.DependencyInjection" Version="4.4.0" />
-    <PackageReference Include="AWSSDK.Core" Version="3.3.32.2" />
-    <PackageReference Include="AWSSDK.S3" Version="3.3.31.24" />
+    <PackageReference Include="AWSSDK.Core" Version="3.3.101.6" />
+    <PackageReference Include="AWSSDK.S3" Version="3.3.101.13" />
     <PackageReference Include="Microsoft.AspNetCore.Http.Features" Version="2.2.0" />
     <PackageReference Include="Microsoft.Extensions.Options" Version="2.2.0" />
-    <PackageReference Include="Minio" Version="3.0.7" />
+    <PackageReference Include="Minio" Version="3.0.9" />
     <PackageReference Include="Minio.NetCore" Version="1.1.1" />
     <PackageReference Include="Serilog" Version="2.8.0" />
   </ItemGroup>
